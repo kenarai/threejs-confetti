@@ -34,11 +34,13 @@ module.exports = {
             // html
             {
                 test: /\.html$/,
-                loader: "html-loader"
+                loader: "html-loader",
+                exclude: [/dist/, /node_modules/],
             },
             // SASS取り込み設定
             {
                 test: /\.scss/,
+                exclude: [/dist/, /node_modules/],
                 use: [
                     'style-loader',
                     {
@@ -55,12 +57,19 @@ module.exports = {
                     }
                 ]
             },
+            // elm
+            {
+                test: /\.elm$/,
+                exclude: [/elm-stuff/, /node_modules/],
+                loader: 'elm-webpack-loader',
+            },
             // typescript
             {
                 // 拡張子 .ts の場合
                 test: /\.ts$/,
                 // TypeScript をコンパイルする
-                use: "ts-loader"
+                use: "ts-loader",
+                exclude: [/dist/, /node_modules/]
             }
         ]
     },

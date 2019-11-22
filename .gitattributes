@@ -1,2 +1,2 @@
-dist/* linguist-documentation
-public/* linguist-documentation
+dist/* linguist-vendored
+public/* linguist-vendored
