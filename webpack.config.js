@@ -35,7 +35,7 @@ module.exports = {
             {
                 test: /\.html$/,
                 loader: "html-loader",
-                exclude: [/dist/, /node_modules/],
+                exclude: [/dist/, /node_modules/,],
             },
             // SASS取り込み設定
             {
@@ -75,7 +75,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./public/index.html"
+            template: "./src/html/index.html"
         })
     ],
     // import 文で .ts ファイルを解決するため

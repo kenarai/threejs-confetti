@@ -1,25 +1,59 @@
 module Elm.Main exposing (main)
 
 import Browser
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, button, div, text, ul, li)
+import Html.Attributes exposing (class, id, value, placeholder)
 import Html.Events exposing (onClick)
 
+
 main =
-  Browser.sandbox { init = 0, update = update, view = view }
+  Browser.sandbox { init = init, update = update, view = view }
 
-type Msg = Increment | Decrement
 
-update msg model =
+-- MODEL
+
+type alias Page = Int
+
+init : Page
+init =
+  0
+
+
+-- UPDATE
+
+type Msg = Next | Before
+
+update : Msg -> Page -> Page
+update msg page =
   case msg of
-    Increment ->
-      model + 1
+    Next ->
+      page + 1
 
-    Decrement ->
-      model - 1
+    Before ->
+      page - 1
 
-view model =
-  div []
-    [ button [ onClick Decrement ] [ text "-" ]
-    , div [] [ text (String.fromInt model) ]
-    , button [ onClick Increment ] [ text "+" ]
+
+-- VIEW
+
+view : Page -> Html Msg
+view page =
+  if page == 0 then
+    div [id "wrapper-top"]
+      [ div [ id "title-top" ] [ text "Art, Code, and Everything" ],
+        div [ id "content-box"] [
+          div [ id "name-top" ] [ text "Name : reta" ],
+          div [ id "activity-top" ] [ text "Activities : ",
+              div [class "list-top"] [ text "2D graphics" ],
+              div [class "list-top"] [ text "frontend" ],
+              div [class "list-top"] [ text "serverside" ]
+          ],
+          div [ id "like-top" ] [ text "Like : weird artworks......" ],
+          div [ id "weirdText-top" ] [text "Latest Update Dec 2019"]
+        ],
+        div [ id "title-next", onClick Next] [text "more informations"]
+      ]
+  else
+    div [][
+      div [] [ text "now under constructing"],
+      div [ id "title-next", onClick Before] [text "prev"]
     ]

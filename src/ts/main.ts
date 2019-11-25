@@ -6,6 +6,6 @@ const sayHello = (name: string) : string => {
   
   console.log(sayHello('TS!'))
 
-const Elm = require('../Elm/Main.elm');
+import { Elm } from '../Elm/Main.elm';
 const mountNode = document.getElementById("elm");
-const app = Elm.Main.init({node: mountNode});
+var app = Elm.Elm.Main.init({node: mountNode}); //  ここずっとElm.Main.initだと思ってて三日くらい溶かした
