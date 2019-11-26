@@ -59,14 +59,22 @@ for (var i = 0; i < dense; i++) {
 }
 //  仮置き球体
 const geo = new THREE.SphereGeometry(300, 30, 30);
-const mat = new THREE.MeshStandardMaterial({color: 0xFFFFFF});
+const mat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
 const mesh = new THREE.Mesh(geo, mat);
 scene.add(mesh);
 // new THREE.PointLight(色, 光の強さ, 距離, 光の減衰率)
 const pointLight = new THREE.PointLight(0xFFFFFF, 2, 1000, 1.0);
-pointLight.position.set( 0, 0, 1000 );
+pointLight.position.set(0, 0, 1000);
 scene.add(pointLight);
 
+//  エフェクトコンポーザー
+var composer = new EffectComposer(renderer);
+//  レンダーパス
+var renderPass = new RenderPass(scene, camera);
+composer.addPass(renderPass);
+//  グリッチパス
+var glitchPass = new GlitchPass(4);
+composer.addPass(glitchPass);
 
 animate();
 
@@ -74,7 +82,7 @@ animate();
 function animate() {
 
   //  マウスでライト位置制御
-  pointLight.position.set( mouseX - width / 2, -mouseY + height / 2, 1000 );
+  pointLight.position.set(mouseX - width / 2, -mouseY + height / 2, 1000);
 
   // マウスの位置で角度を出す
   const targetRotX = - (mouseX - width / 2) / width * 30;
@@ -95,20 +103,10 @@ function animate() {
   // 原点方向を見つめる
   camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-  //  エフェクトコンポーザー
-  var composer = new EffectComposer(renderer);
-  //  レンダーパス
-  var renderPass = new RenderPass(scene, camera);
-  composer.addPass(renderPass);
-  if (frame % 200 > 165) {
-    //  グリッチパス
-    var glitchPass = new GlitchPass(4);
-    composer.addPass(glitchPass);
-  }
   //  レンダリング
   composer.render();
 
   frame++
-  if(frame == 10000) frame = 0;
+  if (frame == 10000) frame = 0;
   requestAnimationFrame(animate);
 }
