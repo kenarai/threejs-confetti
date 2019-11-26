@@ -57,13 +57,16 @@ for (var i = 0; i < dense; i++) {
   var line = new THREE.Line(geometry, material);
   scene.add(line);
 }
-//  仮置き球体
-const geo = new THREE.SphereGeometry(300, 30, 30);
-const mat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF });
-const mesh = new THREE.Mesh(geo, mat);
-scene.add(mesh);
+// 床
+/*
+const meshFloor = new THREE.Mesh(
+  new THREE.BoxGeometry(3000, 3000, 0),
+  new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 1.0 })
+);
+scene.add(meshFloor);
+*/
 // new THREE.PointLight(色, 光の強さ, 距離, 光の減衰率)
-const pointLight = new THREE.PointLight(0xFFFFFF, 2, 1000, 1.0);
+const pointLight = new THREE.PointLight(0xFFFFFF, 1, 1500, 1.0);
 pointLight.position.set(0, 0, 1000);
 scene.add(pointLight);
 
