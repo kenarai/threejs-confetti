@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
 
-    mode: 'development',
+    mode: 'production',
 
     target: 'node',
 
@@ -18,7 +18,7 @@ module.exports = {
         contentBase: './public/index.html'
     },
     module: {
-        // babel-loaderの設定
+        //  babel-loaderの設定
         rules: [{
                 test: /\.js$/,
                 use: [{
@@ -31,13 +31,13 @@ module.exports = {
                 }],
                 exclude: /node_modules/,
             },
-            // html
+            //  html
             {
                 test: /\.html$/,
                 loader: "html-loader",
-                exclude: [/dist/, /node_modules/,],
+                exclude: [/dist/, /node_modules/, ],
             },
-            // SASS取り込み設定
+            //  SASS取り込み設定
             {
                 test: /\.scss/,
                 exclude: [/dist/, /node_modules/],
@@ -57,19 +57,25 @@ module.exports = {
                     }
                 ]
             },
-            // elm
+            //  elm
             {
                 test: /\.elm$/,
                 exclude: [/elm-stuff/, /node_modules/],
                 loader: 'elm-webpack-loader',
             },
-            // typescript
+            //  typescript
             {
                 // 拡張子 .ts の場合
                 test: /\.ts$/,
                 // TypeScript をコンパイルする
                 use: "ts-loader",
                 exclude: [/dist/, /node_modules/]
+            },
+            //  json
+            {
+                test: /\.json$/,
+                loader: 'json-loader',
+                type: "javascript/auto"
             }
         ]
     },

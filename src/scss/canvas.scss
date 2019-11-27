@@ -1,10 +1,13 @@
 @charset "UTF-8";
 
 #canvas{
-    position: absolute;
+    //position: absolute;
     top: 0px;
     left: 0px;
     width: 100vw;
     height: 100vh;
-    z-index: -1;
+    z-index: 0;
+    pointer-events: auto;
+    position: -webkit-sticky;
+    position: sticky;
 }
