@@ -1,10 +1,12 @@
 @charset "UTF-8";
 
+$themaColor: rgb(255, 255, 255);
+
 html {
 
   body {
-    background-color: rgba(0, 0, 0, 0.8);
-    color: rgba(white, 0.85);
+    background-color: rgb(32, 32, 42);
+    color: $themaColor;
 
     #wrapper-top {
       width: 400px;
@@ -12,12 +14,14 @@ html {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);  //  ウィンドウサイズ縮めていった時の挙動が綺麗でいいですね
-      border: solid 2px white;
+      transform: translate(-50%, -50%); //  ウィンドウサイズ縮めていった時の挙動が綺麗でいいですね
+      border: solid 2px $themaColor;
       margin: auto;
       padding-top: 60px;
       text-align: center;
       box-sizing: border-box;
+      user-select: none;
+      pointer-events: none;
 
       #title-top {
         font-size: 25px;
@@ -35,10 +39,10 @@ html {
           padding-left: 25px;
         }
 
-        #weirdText-top{
+        #weirdText-top {
           margin-top: 10px;
           font-style: oblique;
-          color: rgba(white, 0.75);
+          color: rgba($themaColor, 0.75);
         }
       }
 
@@ -52,7 +56,8 @@ html {
         padding-top: 5px;
         font-size: 16px;
         font-weight: 600;
-        border: solid 1px rgba(white, 0.85);
+        border: solid 1px rgba($themaColor, 0.85);
+        pointer-events: auto;
       }
 
     }

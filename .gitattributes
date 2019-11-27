@@ -1,1 +1,2 @@
-dist/* linguist-documentation
+dist/* linguist-vendored
+*.js linguist-vendored
