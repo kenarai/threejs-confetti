@@ -2,7 +2,7 @@
 import "../scss/main.scss";
 import "../scss/canvas.scss";
 
-//  ====================================  Elm  ===========================================================
+//  ====================================  Elm and View  ===========================================================
 
 import { Elm } from '../Elm/Main.elm';
 const mountNode = document.getElementById("elm");
@@ -20,6 +20,7 @@ var width = window.innerWidth;  //  キャンバス横幅
 var height = window.innerHeight;  //  キャンバス縦幅
 var onMouse = false;
 var onClick = false;
+var whiten = false;
 var mouseX = 0; // 　マウス座標
 var mouseY = 0;
 var rotX = 0; //　 角度
@@ -28,8 +29,8 @@ var frame = 0;  //  アニメーションフレーム
 
 document.addEventListener("mousemove", (event) => {  //  マウス座標取得
   onMouse = true;
-  mouseX = event.pageX;
-  mouseY = event.pageY;
+  mouseX = event.clientX;
+  mouseY = event.clientY;
 });
 canvas.addEventListener('mouseout', function () {
   onMouse = false;
@@ -39,6 +40,13 @@ canvas.addEventListener('mousedown', function () {
 }, false);
 canvas.addEventListener('mouseup', function () {
   onClick = false;
+}, false);
+document.addEventListener('scroll', function (e) {
+  if (window.scrollY > height * 1 / 2) {
+    whiten = true;
+  } else {
+    whiten = false;
+  }
 }, false);
 
 //  Renderer  ===========================================================
@@ -62,77 +70,109 @@ scene.fog = new THREE.Fog(0x000000, 100, 1000);
 const camera = new THREE.PerspectiveCamera(60, width / height);
 camera.position.set(0, 0, +250);
 
-//  Mesh  ====================================================================
-//  mesh生成
+//  Light  ======================================================================================
+//  PointLight(色, 光の強さ, 距離, 光の減衰率)
+const pointLight = new THREE.PointLight(0x8accc7, 1.0, 1000, 0.5);
+pointLight.position.set(0, 0, 0);
+pointLight.castShadow = true;
+pointLight.shadow.mapSize.width = 1024;
+pointLight.shadow.mapSize.height = 1024;
+scene.add(pointLight);
+//  PointLight(色, 光の強さ, 距離, 光の減衰率)
+const additionalLight = new THREE.PointLight(0xffffff, 4.0, 600, 0.5);
+additionalLight.position.set(0, 0, 500);
+additionalLight.castShadow = false;
+additionalLight.shadow.mapSize.width = 1024;
+additionalLight.shadow.mapSize.height = 1024;
+scene.add(additionalLight);
+//const pointLightHelper = new THREE.PointLightHelper(pointLight, 30);
+//scene.add(pointLightHelper);
+//  ambientLight(色, 光の強さ)
+var ambientLight = new THREE.AmbientLight(0x404040, 3.0); // soft white light
+scene.add(ambientLight);
+//  Text  =====================================================================================
+//  domでタイトル書くか3Dで書くかどっちがいいと思う……？
+/*
+const fontFile = require('three/examples/fonts/helvetiker_regular.typeface.json');
+
+let font = new THREE.FontLoader().parse(fontFile);
+var textGeometry = new THREE.TextGeometry('MelanCute', {
+  font: font,
+  size: 30,
+  height: 1,
+  curveSegments: 12,
+  bevelEnabled: false,
+  bevelThickness: 2,
+  bevelSize: 0,
+  bevelOffset: 0,
+  bevelSegments: 0
+});
+textGeometry.center();
+var textMaterial = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, flatShading: true });
+var textMesh = new THREE.Mesh(textGeometry, textMaterial);
+textMesh.position.y += 20;
+textMesh.position.z -= 0;
+textMesh.castShadow = true;
+textMesh.receiveShadow = false;
+scene.add(textMesh);
+*/
+
+//  Mesh  =====================================================================================
+//  床
+const meshFloor = new THREE.Mesh(
+  new THREE.BoxGeometry(5000, 5000, 0),
+  new THREE.MeshStandardMaterial({ color: 0x87314e, roughness: 1.0 })
+);
+meshFloor.position.z = -250
+meshFloor.receiveShadow = true;
+scene.add(meshFloor);
+//  紙吹雪
 var groupA = new THREE.Group();
 var groupB = new THREE.Group();
 var groupC = new THREE.Group();
-var material = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, flatShading: true });
-var geometry = new THREE.BoxGeometry(8, 8, 0.2);
-var mesh = [];
+var boardMaterial = new THREE.MeshLambertMaterial({ color: 0x70001d, flatShading: true });
+var boardGeometry = new THREE.BoxGeometry(8, 8, 0.2);
+var boardMesh = [];
 for (var i = 0; i < 200; i++) {
-  mesh[i] = new THREE.Mesh(geometry, material);
+  boardMesh[i] = new THREE.Mesh(boardGeometry, boardMaterial);
   //  位置
-  mesh[i].position.x = Math.random() * 600 - 300;
-  mesh[i].position.y = Math.random() * 600 - 300;
-  mesh[i].position.z = Math.random() * 600 - 300;
+  boardMesh[i].position.x = Math.random() * 600 - 300;
+  boardMesh[i].position.y = Math.random() * 600 - 300;
+  boardMesh[i].position.z = Math.random() * 600 - 300;
   //  サイズ
-  mesh[i].scale.setScalar(Math.random() * 2 + 1);
+  boardMesh[i].scale.setScalar(Math.random() * 2 + 1);
   //  角度
-  mesh[i].rotation.x = Math.random() * Math.PI;
-  mesh[i].rotation.y = Math.random() * Math.PI;
-  mesh[i].rotation.z = Math.random() * Math.PI;
-  mesh[i].castShadow = true;
-  mesh[i].receiveShadow = true;
+  boardMesh[i].rotation.x = Math.random() * Math.PI;
+  boardMesh[i].rotation.y = Math.random() * Math.PI;
+  boardMesh[i].rotation.z = Math.random() * Math.PI;
+  boardMesh[i].castShadow = true;
+  boardMesh[i].receiveShadow = true;
   //  初期位置を保持
-  mesh[i].defaultX = mesh[i].position.x;
-  mesh[i].defaultZ = mesh[i].position.z;
+  boardMesh[i].defaultX = boardMesh[i].position.x;
+  boardMesh[i].defaultZ = boardMesh[i].position.z;
   //  アニメーション速度を決めておく
-  mesh[i].moveX = Math.random() * 1.0 - 0.5;
-  mesh[i].moveY = Math.random() * 1.5 + 0.5;
-  mesh[i].moveZ = Math.random() * 1.0 - 0.5;
-  mesh[i].rotateX = Math.random() * 0.002;
-  mesh[i].rotateY = Math.random() * 0.10;
-  mesh[i].rotateZ = Math.random() * 0.002;
+  boardMesh[i].moveX = Math.random() * 1.0 - 0.5;
+  boardMesh[i].moveY = Math.random() * 1.5 + 0.5;
+  boardMesh[i].moveZ = Math.random() * 1.0 - 0.5;
+  boardMesh[i].rotateX = Math.random() * 0.002;
+  boardMesh[i].rotateY = Math.random() * 0.10;
+  boardMesh[i].rotateZ = Math.random() * 0.002;
   //  グループに追加
   switch (i % 3) {
     case 0:
-      groupA.add(mesh[i]);
+      groupA.add(boardMesh[i]);
       break;
     case 1:
-      groupB.add(mesh[i]);
+      groupB.add(boardMesh[i]);
       break;
     case 2:
-      groupC.add(mesh[i]);
+      groupC.add(boardMesh[i]);
       break;
   }
 }
 scene.add(groupA);
 scene.add(groupB);
 scene.add(groupC);
-
-//  床
-const meshFloor = new THREE.Mesh(
-  new THREE.BoxGeometry(5000, 5000, 0),
-  new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 1.0 })
-);
-meshFloor.position.z = -250
-meshFloor.receiveShadow = true;
-scene.add(meshFloor);
-
-//  Light  ======================================================================================
-//  PointLight(色, 光の強さ, 距離, 光の減衰率)
-const pointLight = new THREE.PointLight(0xa3daff, 1.5, 1000, 0.5);
-pointLight.position.set(0, 0, 0);
-pointLight.castShadow = true;
-pointLight.shadow.mapSize.width = 1024;
-pointLight.shadow.mapSize.height = 1024;
-scene.add(pointLight);
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 30);
-scene.add(pointLightHelper);
-//  ambientLight(色, 光の強さ)
-var ambientLight = new THREE.AmbientLight(0x404040, 3.0); // soft white light
-scene.add(ambientLight);
 
 //  Effect  =============================================================================
 //  エフェクトコンポーザー
@@ -163,18 +203,18 @@ function animate() {
   //  meshのアニメーション
   for (let i = 0; i < 200; i++) {
     //  移動
-    mesh[i].position.x -= mesh[i].moveX;
-    mesh[i].position.y -= mesh[i].moveY;
-    mesh[i].position.y -= mesh[i].moveZ;
+    boardMesh[i].position.x -= boardMesh[i].moveX;
+    boardMesh[i].position.y -= boardMesh[i].moveY;
+    boardMesh[i].position.y -= boardMesh[i].moveZ;
     //  回転
-    mesh[i].rotation.x += mesh[i].rotateX;
-    mesh[i].rotation.y += mesh[i].rotateY;
-    mesh[i].rotation.z += mesh[i].rotateZ;
+    boardMesh[i].rotation.x += boardMesh[i].rotateX;
+    boardMesh[i].rotation.y += boardMesh[i].rotateY;
+    boardMesh[i].rotation.z += boardMesh[i].rotateZ;
     //  使いまわし
-    if (mesh[i].position.y < -300) {
-      mesh[i].position.x = mesh[i].defaultX;
-      mesh[i].position.y = 300
-      mesh[i].position.z = mesh[i].defaultZ;
+    if (boardMesh[i].position.y < -300) {
+      boardMesh[i].position.x = boardMesh[i].defaultX;
+      boardMesh[i].position.y = 300
+      boardMesh[i].position.z = boardMesh[i].defaultZ;
     }
   }
   //  groupのアニメーション
@@ -201,8 +241,18 @@ function animate() {
     pointLight.position.y = -mouseY + height / 2;
   }
 
-  //  レンダリング
-  composer.render();
+  //  whitening and rendering
+  var delta = 0.01;
+  if (whiten == true) {
+    if (meshFloor.material.opacity > 0.00) meshFloor.material.opacity -= delta;
+    if (boardMaterial.opacity > 0.03) boardMaterial.opacity -= delta;
+    renderer.render(scene, camera);
+  } else {
+    if (meshFloor.material.opacity < 1.00) meshFloor.material.opacity += delta;
+    if (boardMaterial.opacity < 1.00) boardMaterial.opacity += delta;
+    composer.render();
+  }
+
   //  アニメーション
   frame++
   requestAnimationFrame(animate);
