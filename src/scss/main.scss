@@ -79,6 +79,7 @@ html {
       width: 100vw;
       padding-top: 10vh;
       padding-left: 20vw;
+      margin-bottom: 30vh;
       box-sizing: border-box;
       pointer-events: none;
       background-color: rgba(256, 256, 256, 0.0);
@@ -116,58 +117,6 @@ html {
           vertical-align: top;
           margin-top: 20px;
         }
-      }
-    }
-
-    #wrapper-skill {
-      color: $subColor;
-      position: relative;
-      width: 100vw;
-      padding-top: 10vh;
-      padding-left: 20vw;
-      margin-bottom: 100px;
-      box-sizing: border-box;
-      background-color: rgba(256, 256, 256, 0.0);
-      pointer-events: none;
-      #title-skill {
-        width: 70%;
-        font-size: 40px;
-        font-weight: 200;
-        letter-spacing: 5px;
-        border-bottom: solid 1px $subColor;
-        margin-bottom: 60px;
-      }
-      .headline-skill{
-        font-size: 20px;
-        font-weight: 200;
-        margin-top: 20px;
-        letter-spacing: 2px;
-      }
-      .caption-skill{
-        margin-top: 10px;
-        letter-spacing: 1px;
-      }
-    }
-
-    #wrapper-note{
-      color: $subColor;
-      position: relative;
-      width: 100vw;
-      padding-top: 10vh;
-      padding-left: 10vw;
-      padding-bottom: 10vh;
-      box-sizing: border-box;
-      background-color: rgba(256, 256, 256, 0.0);
-      pointer-events: none;
-      #title-note {
-        text-align: center;
-        width: 90%;
-        padding-left: -10%;
-        font-size: 20px;
-        font-weight: 200;
-        letter-spacing: 5px;
-        border-bottom: solid 1px $subColor;
-        margin-bottom: 60px;
       }
     }
   }
