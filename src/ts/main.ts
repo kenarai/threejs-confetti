@@ -2,12 +2,6 @@
 import "../scss/main.scss";
 import "../scss/canvas.scss";
 
-//  ====================================  Elm and View  ===========================================================
-
-import { Elm } from '../Elm/Main.elm';
-const mountNode = document.getElementById("elm");
-var app = Elm.Elm.Main.init({ node: mountNode }); //  ここずっとElm.Main.initだと思ってて三日くらい溶かした
-
 //  ====================================  WebGL  =========================================================
 
 const THREE = require("three");

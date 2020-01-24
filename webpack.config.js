@@ -57,12 +57,6 @@ module.exports = {
                     }
                 ]
             },
-            //  elm
-            {
-                test: /\.elm$/,
-                exclude: [/elm-stuff/, /node_modules/],
-                loader: 'elm-webpack-loader',
-            },
             //  typescript
             {
                 // 拡張子 .ts の場合
