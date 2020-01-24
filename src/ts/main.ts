@@ -14,12 +14,13 @@ var width = window.innerWidth;  //  キャンバス横幅
 var height = window.innerHeight;  //  キャンバス縦幅
 var onMouse = false;
 var onClick = false;
-var whiten = false;
 var mouseX = 0; // 　マウス座標
 var mouseY = 0;
-var rotX = 0; //　 角度
+var rotX = 0; //　 視点角度
 var rotY = 0;
 var frame = 0;  //  アニメーションフレーム
+
+var bgColor = "0xffffff"
 
 document.addEventListener("mousemove", (event) => {  //  マウス座標取得
   onMouse = true;
@@ -34,13 +35,6 @@ canvas.addEventListener('mousedown', function () {
 }, false);
 canvas.addEventListener('mouseup', function () {
   onClick = false;
-}, false);
-document.addEventListener('scroll', function (e) {
-  if (window.scrollY > height * 1 / 2) {
-    whiten = true;
-  } else {
-    whiten = false;
-  }
 }, false);
 
 //  Renderer  ===========================================================
@@ -66,13 +60,13 @@ camera.position.set(0, 0, +250);
 
 //  Light  ======================================================================================
 //  PointLight(色, 光の強さ, 距離, 光の減衰率)
-const pointLight = new THREE.PointLight(0x8accc7, 1.0, 1000, 0.5);
+const pointLight = new THREE.PointLight(0xffffff, 1.0, 1000, 0.5);
 pointLight.position.set(0, 0, 0);
 pointLight.castShadow = true;
 pointLight.shadow.mapSize.width = 1024;
 pointLight.shadow.mapSize.height = 1024;
 scene.add(pointLight);
-//  PointLight(色, 光の強さ, 距離, 光の減衰率)
+//  明暗付けのpointLight
 const additionalLight = new THREE.PointLight(0xffffff, 4.0, 600, 0.5);
 additionalLight.position.set(0, 0, 500);
 additionalLight.castShadow = false;
@@ -86,36 +80,36 @@ var ambientLight = new THREE.AmbientLight(0x404040, 3.0); // soft white light
 scene.add(ambientLight);
 //  Text  =====================================================================================
 //  domでタイトル書くか3Dで書くかどっちがいいと思う……？
-/*
+
 const fontFile = require('three/examples/fonts/helvetiker_regular.typeface.json');
 
 let font = new THREE.FontLoader().parse(fontFile);
-var textGeometry = new THREE.TextGeometry('MelanCute', {
+var textGeometry = new THREE.TextGeometry('Glitch', {
   font: font,
   size: 30,
   height: 1,
   curveSegments: 12,
   bevelEnabled: false,
-  bevelThickness: 2,
+  bevelThickness: 0.1,
   bevelSize: 0,
   bevelOffset: 0,
   bevelSegments: 0
 });
 textGeometry.center();
-var textMaterial = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, flatShading: true });
+var textMaterial = new THREE.MeshLambertMaterial({ color: 0x000000, flatShading: true });
 var textMesh = new THREE.Mesh(textGeometry, textMaterial);
 textMesh.position.y += 20;
 textMesh.position.z -= 0;
 textMesh.castShadow = true;
 textMesh.receiveShadow = false;
 scene.add(textMesh);
-*/
+
 
 //  Mesh  =====================================================================================
 //  床
 const meshFloor = new THREE.Mesh(
   new THREE.BoxGeometry(5000, 5000, 0),
-  new THREE.MeshStandardMaterial({ color: 0x87314e, roughness: 1.0 })
+  new THREE.MeshToonMaterial({ color: bgColor, roughness: 1.0 })
 );
 meshFloor.position.z = -250
 meshFloor.receiveShadow = true;
@@ -175,8 +169,10 @@ var composer = new EffectComposer(renderer);
 var renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 //  グリッチパス
+/*
 var glitchPass = new GlitchPass(4);
 composer.addPass(glitchPass);
+*/
 
 animate();
 
@@ -204,7 +200,7 @@ function animate() {
     boardMesh[i].rotation.x += boardMesh[i].rotateX;
     boardMesh[i].rotation.y += boardMesh[i].rotateY;
     boardMesh[i].rotation.z += boardMesh[i].rotateZ;
-    //  使いまわし
+    //  ポジションリセット
     if (boardMesh[i].position.y < -300) {
       boardMesh[i].position.x = boardMesh[i].defaultX;
       boardMesh[i].position.y = 300
@@ -234,18 +230,8 @@ function animate() {
     pointLight.position.x = mouseX - width / 2;
     pointLight.position.y = -mouseY + height / 2;
   }
-
-  //  whitening and rendering
-  var delta = 0.01;
-  if (whiten == true) {
-    if (meshFloor.material.opacity > 0.00) meshFloor.material.opacity -= delta;
-    if (boardMaterial.opacity > 0.03) boardMaterial.opacity -= delta;
-    renderer.render(scene, camera);
-  } else {
-    if (meshFloor.material.opacity < 1.00) meshFloor.material.opacity += delta;
-    if (boardMaterial.opacity < 1.00) boardMaterial.opacity += delta;
-    composer.render();
-  }
+  
+  composer.render();
 
   //  アニメーション
   frame++
