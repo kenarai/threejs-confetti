@@ -20,9 +20,11 @@ var rotX = 0; //　 視点角度
 var rotY = 0;
 var frame = 0;  //  アニメーションフレーム
 
-var bgColor = "0xffffff"
+var wireframe = false;
+var glitch = false;
 
-document.addEventListener("mousemove", (event) => {  //  マウス座標取得
+//  マウス制御
+document.addEventListener("mousemove", (event) => {
   onMouse = true;
   mouseX = event.clientX;
   mouseY = event.clientY;
@@ -32,10 +34,22 @@ canvas.addEventListener('mouseout', function () {
 }, false);
 canvas.addEventListener('mousedown', function () {
   onClick = true;
+  wireframe = wireframe ? false : true;
 }, false);
 canvas.addEventListener('mouseup', function () {
   onClick = false;
 }, false);
+canvas.addEventListener('dblclick', function () {
+  glitch = glitch ? false : true;
+}, false);
+
+//  キャンバスサイズ制御
+window.addEventListener("resize", function () {
+  width = window.innerWidth;
+  height = this.window.innerHeight;
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(width, height);
+})
 
 //  Renderer  ===========================================================
 const renderer = new THREE.WebGLRenderer({
@@ -59,8 +73,9 @@ const camera = new THREE.PerspectiveCamera(60, width / height);
 camera.position.set(0, 0, +250);
 
 //  Light  ======================================================================================
+
 //  PointLight(色, 光の強さ, 距離, 光の減衰率)
-const pointLight = new THREE.PointLight(0xffffff, 1.0, 1000, 0.5);
+const pointLight = new THREE.PointLight(0xffffff, 2.0, 1000, 0.5);
 pointLight.position.set(0, 0, 0);
 pointLight.castShadow = true;
 pointLight.shadow.mapSize.width = 1024;
@@ -78,15 +93,16 @@ scene.add(additionalLight);
 //  ambientLight(色, 光の強さ)
 var ambientLight = new THREE.AmbientLight(0x404040, 3.0); // soft white light
 scene.add(ambientLight);
+
 //  Text  =====================================================================================
 //  domでタイトル書くか3Dで書くかどっちがいいと思う……？
 
 const fontFile = require('three/examples/fonts/helvetiker_regular.typeface.json');
 
 let font = new THREE.FontLoader().parse(fontFile);
-var textGeometry = new THREE.TextGeometry('Glitch', {
+var textGeometry = new THREE.TextGeometry('Confetti', {
   font: font,
-  size: 30,
+  size: 28,
   height: 1,
   curveSegments: 12,
   bevelEnabled: false,
@@ -96,7 +112,7 @@ var textGeometry = new THREE.TextGeometry('Glitch', {
   bevelSegments: 0
 });
 textGeometry.center();
-var textMaterial = new THREE.MeshLambertMaterial({ color: 0x000000, flatShading: true });
+var textMaterial = new THREE.MeshLambertMaterial({ color: 0xf7fcc2, flatShading: true });
 var textMesh = new THREE.Mesh(textGeometry, textMaterial);
 textMesh.position.y += 20;
 textMesh.position.z -= 0;
@@ -106,23 +122,49 @@ scene.add(textMesh);
 
 
 //  Mesh  =====================================================================================
+
 //  床
 const meshFloor = new THREE.Mesh(
   new THREE.BoxGeometry(5000, 5000, 0),
-  new THREE.MeshToonMaterial({ color: bgColor, roughness: 1.0 })
+  new THREE.MeshStandardMaterial({ color: 0x22252e, roughness: 1.0 })
 );
 meshFloor.position.z = -250
 meshFloor.receiveShadow = true;
 scene.add(meshFloor);
+
 //  紙吹雪
 var groupA = new THREE.Group();
 var groupB = new THREE.Group();
 var groupC = new THREE.Group();
-var boardMaterial = new THREE.MeshLambertMaterial({ color: 0x70001d, flatShading: true });
+//  各種紙吹雪のマテリアル
+var boardMaterialRed = new THREE.MeshLambertMaterial({ color: 0x6b0606, flatShading: true });
+var boardMaterialBlue = new THREE.MeshLambertMaterial({ color: 0x3258a8, flatShading: true });
+var boardMaterialYellow = new THREE.MeshLambertMaterial({ color: 0xc4bb4f, flatShading: true });
+var boardMaterialGreen = new THREE.MeshLambertMaterial({ color: 0x6ad126, flatShading: true });
+var boardMaterialOrange = new THREE.MeshLambertMaterial({ color: 0xe38827, flatShading: true });
+//  サイズ
 var boardGeometry = new THREE.BoxGeometry(8, 8, 0.2);
+//  メッシュの生成
 var boardMesh = [];
 for (var i = 0; i < 200; i++) {
-  boardMesh[i] = new THREE.Mesh(boardGeometry, boardMaterial);
+  //  メッシュを色ごとに生成
+  switch (i % 5) {
+    case 0:
+      boardMesh[i] = new THREE.Mesh(boardGeometry, boardMaterialRed);
+      break;
+    case 1:
+      boardMesh[i] = new THREE.Mesh(boardGeometry, boardMaterialBlue);
+      break;
+    case 2:
+      boardMesh[i] = new THREE.Mesh(boardGeometry, boardMaterialYellow);
+      break;
+    case 3:
+      boardMesh[i] = new THREE.Mesh(boardGeometry, boardMaterialGreen);
+      break;
+    case 4:
+      boardMesh[i] = new THREE.Mesh(boardGeometry, boardMaterialOrange);
+      break;
+  }
   //  位置
   boardMesh[i].position.x = Math.random() * 600 - 300;
   boardMesh[i].position.y = Math.random() * 600 - 300;
@@ -169,10 +211,8 @@ var composer = new EffectComposer(renderer);
 var renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 //  グリッチパス
-/*
 var glitchPass = new GlitchPass(4);
 composer.addPass(glitchPass);
-*/
 
 animate();
 
@@ -189,6 +229,14 @@ function animate() {
     pointLight.position.x = pointLight.position.x - (pointLight.position.x) * 0.01;
     pointLight.position.y = pointLight.position.y - (pointLight.position.y) * 0.01;
   }
+
+  //  wireframe表示対応
+  textMaterial.wireframe = wireframe ? true : false;
+  boardMaterialRed.wireframe = wireframe ? true : false;
+  boardMaterialBlue.wireframe = wireframe ? true : false;
+  boardMaterialYellow.wireframe = wireframe ? true : false;
+  boardMaterialGreen.wireframe = wireframe ? true : false;
+  boardMaterialOrange.wireframe = wireframe ? true : false;
 
   //  meshのアニメーション
   for (let i = 0; i < 200; i++) {
@@ -230,8 +278,12 @@ function animate() {
     pointLight.position.x = mouseX - width / 2;
     pointLight.position.y = -mouseY + height / 2;
   }
-  
-  composer.render();
+  //  glitch分岐
+  if (glitch) {
+    composer.render();
+  }else{
+    renderer.render(scene, camera);
+  }
 
   //  アニメーション
   frame++
