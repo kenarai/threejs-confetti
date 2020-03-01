@@ -12,7 +12,8 @@ html {
     //-ms-overflow-style: none;
 
     #wrapper-all {
-      height: auto;
+      height: 100vh;
+      width: 100vw;
       display: inline-block;
       position: relative;
       box-sizing: border-box;
