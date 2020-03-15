@@ -39,9 +39,11 @@ canvas.addEventListener('mousedown', function () {
 canvas.addEventListener('mouseup', function () {
   onClick = false;
 }, false);
+/*
 canvas.addEventListener('dblclick', function () {
   glitch = glitch ? false : true;
 }, false);
+*/
 
 //  キャンバスサイズ制御
 window.addEventListener("resize", function () {
